@@ -1,0 +1,6 @@
+{
+  "name": "ClimTrack - Gestion des Installations de Climatiseurs",
+  "description": "Application professionnelle complète de gestion et suivi des clients, techniciens, installations de climatiseurs, interventions, bons de contrôle et paiements avec statistiques en temps réel et rapports exportables.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
