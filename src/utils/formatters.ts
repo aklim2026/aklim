@@ -66,10 +66,10 @@ export function getStatusBadgeClass(statut: string): string {
   }
 }
 
-export function generateNumeroControle(): string {
+export function generateNumeroContrat(): string {
   const year = new Date().getFullYear();
   const rand = Math.floor(100 + Math.random() * 900);
-  return `CTRL-${year}-${rand}`;
+  return `CONT-${year}-${rand}`;
 }
 
 export function generateNumeroBon(): string {

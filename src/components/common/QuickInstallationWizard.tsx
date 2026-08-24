@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
 import { Technicien, Quartier, Client, TypeClimatiseur, InstallationStatut, TypeClient } from '../../types';
 import { Modal } from './Modal';
-import { generateNumeroControle, generateNumeroBon } from '../../utils/formatters';
+import { generateNumeroContrat, generateNumeroBon } from '../../utils/formatters';
 import { Plus, Check, Airplay, User, Wrench, Receipt, FileText } from 'lucide-react';
 
 export const QuickInstallationWizard: React.FC = () => {
@@ -23,10 +23,11 @@ export const QuickInstallationWizard: React.FC = () => {
   const [quartierid, setQuartierId] = useState('');
   const [adresse, setAdresse] = useState('');
   const [typeclient, setTypeClient] = useState<TypeClient>('Standard');
+  const [prixtachesuppl, setPrixTacheSuppl] = useState<number>(0);
 
   const [technicienid, setTechnicienId] = useState('');
   const [dateinstallation, setDateInstallation] = useState(new Date().toISOString().split('T')[0]);
-  const [numerocontrole, setNumeroControle] = useState(generateNumeroControle());
+  const [numerocontrat, setNumeroContrat] = useState(generateNumeroContrat());
   const [numerobon, setNumeroBon] = useState(generateNumeroBon());
 
   const [typeclimatiseur, setTypeClimatiseur] = useState<TypeClimatiseur>('Split Mural');
@@ -37,8 +38,8 @@ export const QuickInstallationWizard: React.FC = () => {
   const [prix, setPrix] = useState<number>(0);
   const [montantpaye, setMontantPaye] = useState<number>(0);
   const [statut, setStatut] = useState<InstallationStatut>('Installée');
-  const [tacherealisee, setTacheRealisee] = useState('Installation standard, tirage au vide et mise en service');
-  const [observation, setObservation] = useState('Installation et test de froid conformes');
+  const [tacherealisee, setTacheRealisee] = useState('');
+  const [observation, setObservation] = useState('');
 
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +52,7 @@ export const QuickInstallationWizard: React.FC = () => {
           setClients(clis);
           if (techs.length > 0 && !technicienid) setTechnicienId(techs[0].id);
           if (qrts.length > 0 && !quartierid) setQuartierId(qrts[0].id);
-          setNumeroControle(generateNumeroControle());
+          setNumeroContrat(generateNumeroContrat());
           setNumeroBon(generateNumeroBon());
         }
       );
@@ -101,7 +102,7 @@ export const QuickInstallationWizard: React.FC = () => {
           typeclient,
           technicienid,
           techniciennom: tObj ? `${tObj.prenom} ${tObj.nom}` : '',
-          numerocontrole,
+          numerocontrat,
           numerobon,
           climatiseurinfo: `${marque} ${puissance} (${typeclimatiseur}) x${quantite}`,
           dateinstallation,
@@ -115,7 +116,7 @@ export const QuickInstallationWizard: React.FC = () => {
         clientid: finalClientId,
         technicienid,
         dateinstallation,
-        numerocontrole,
+        numerocontrat,
         numerobon,
         typeclimatiseur,
         marque,
@@ -127,6 +128,7 @@ export const QuickInstallationWizard: React.FC = () => {
         statut,
         typeclient,
         tacherealisee,
+        prixtachesuppl,
         observation,
       });
 
@@ -317,14 +319,24 @@ export const QuickInstallationWizard: React.FC = () => {
                 ))}
               </select>
             </div>
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-medium text-slate-600 mb-1">Adresse détaillée / Repères</label>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Numéro de bon *</label>
               <input
                 type="text"
-                placeholder="ex: 12 Rue d'Agadir, Immeuble B, 3ème étage"
-                value={adresse}
-                onChange={e => setAdresse(e.target.value)}
-                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+                required
+                value={numerobon}
+                onChange={e => setNumeroBon(e.target.value)}
+                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Numéro de contrat *</label>
+              <input
+                type="text"
+                required
+                value={numerocontrat}
+                onChange={e => setNumeroContrat(e.target.value)}
+                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
               />
             </div>
           </div>
@@ -334,11 +346,11 @@ export const QuickInstallationWizard: React.FC = () => {
         <div className="bg-slate-50/60 p-4 rounded-xl border border-slate-100 space-y-4">
           <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
             <Wrench className="w-4 h-4 text-indigo-600" />
-            <span>2. Affectation Technicien & Numéros de Dossier</span>
+            <span>2. Affectation Technicien & Dates</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="sm:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="sm:col-span-1">
               <label className="block text-xs font-medium text-slate-600 mb-1">Technicien affecté *</label>
               <select
                 required
@@ -378,24 +390,26 @@ export const QuickInstallationWizard: React.FC = () => {
                 <option value="Annulée">Annulée</option>
               </select>
             </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">Numéro de bon *</label>
+
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-medium text-slate-600 mb-1">Travaux supplémentaires réalisés (ex: Recharge Gaz, Tuyauterie...)</label>
               <input
                 type="text"
-                required
-                value={numerobon}
-                onChange={e => setNumeroBon(e.target.value)}
-                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+                placeholder="Décrivez les travaux additionnels..."
+                value={tacherealisee}
+                onChange={e => setTacheRealisee(e.target.value)}
+                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
               />
             </div>
+
             <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">Numéro de contrôle *</label>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Prix Travaux Suppl. (DH)</label>
               <input
-                type="text"
-                required
-                value={numerocontrole}
-                onChange={e => setNumeroControle(e.target.value)}
-                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+                type="number"
+                placeholder="0.00"
+                value={prixtachesuppl || ''}
+                onChange={e => setPrixTacheSuppl(Number(e.target.value))}
+                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
               />
             </div>
           </div>

@@ -17,8 +17,9 @@ import { supabase } from '../lib/supabase';
 
 // Helper to get current user ID
 const getUserId = async () => {
+  if (!supabase) return null;
   try {
-    const { data: { session } } = await supabase!.auth.getSession();
+    const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) return session.user.id;
     
     const { data: { user } } = await supabase!.auth.getUser();
@@ -76,9 +77,9 @@ export const api = {
 
       const filteredClients = clients || [];
       const filteredTechs = techs || [];
-      const filteredInsts = insts || [];
+      const filteredInsts = (insts || []).map(i => ({ ...i, numerocontrat: i.numerocontrole }));
       const filteredInts = ints || [];
-      const filteredPays = pays || [];
+      const filteredPays = (pays || []).map(p => ({ ...p, numerocontrat: p.numerocontrole }));
 
       const totalEncaisse = filteredPays.reduce((acc, p) => acc + (Number(p.montant) || 0), 0);
       const totalFacture = filteredInsts.reduce((acc, i) => acc + (Number(i.prix) || 0), 0);
@@ -230,12 +231,18 @@ export const api = {
     if (!userId) return [];
     const { data, error } = await supabase!.from('clients').select('*').eq('user_id', userId).order('createdat', { ascending: false });
     if (error) throw error;
-    return data as Client[];
+    return (data || []).map(c => ({
+      ...c,
+      numerocontrat: c.numerocontrole
+    })) as Client[];
   },
   getClient: async (id: string) => {
     const { data, error } = await supabase!.from('clients').select('*').eq('id', id).single();
     if (error) throw error;
-    return data as Client;
+    return {
+      ...data,
+      numerocontrat: data.numerocontrole
+    } as Client;
   },
   getClientFullDetails: async (id: string): Promise<ClientFullDetails> => {
     const [
@@ -254,10 +261,13 @@ export const api = {
     const totalPaye = pays?.reduce((acc, p) => acc + (Number(p.montant) || 0), 0) || 0;
 
     return {
-      client,
-      installations: insts || [],
+      client: {
+        ...client,
+        numerocontrat: client.numerocontrole
+      },
+      installations: (insts || []).map(i => ({ ...i, numerocontrat: i.numerocontrole })),
       interventions: ints || [],
-      paiements: pays || [],
+      paiements: (pays || []).map(p => ({ ...p, numerocontrat: p.numerocontrole })),
       totalFacture,
       totalPaye,
       soldeRestant: Math.max(0, totalFacture - totalPaye)
@@ -267,12 +277,33 @@ export const api = {
   createClient: async (client: Partial<Client>) => {
     const userId = await getUserId();
     if (!userId) throw new Error('Authentification requise');
-    const { data, error } = await supabase!.from('clients').insert([{ ...client, user_id: userId }]).select().single();
+    
+    // Only send core fields that are guaranteed to be in the base schema
+    // To avoid "column not found" errors for extended fields
+    const coreClient = {
+      nom: client.nom,
+      kinya: client.kinya,
+      telephone: client.telephone,
+      quartierid: client.quartierid,
+      quartiernom: client.quartiernom,
+      adresse: client.adresse,
+      typeclient: client.typeclient,
+      user_id: userId
+    };
+
+    const { data, error } = await supabase!.from('clients').insert([coreClient]).select().single();
     if (error) throw error;
     return data as Client;
   },
   updateClient: async (id: string, client: Partial<Client>) => {
-    const { data, error } = await supabase!.from('clients').update(client).eq('id', id).select().single();
+    // Only update core fields
+    const coreUpdates: any = {};
+    const allowed = ['nom', 'kinya', 'telephone', 'quartierid', 'quartiernom', 'adresse', 'typeclient'];
+    allowed.forEach(key => {
+      if ((client as any)[key] !== undefined) coreUpdates[key] = (client as any)[key];
+    });
+
+    const { data, error } = await supabase!.from('clients').update(coreUpdates).eq('id', id).select().single();
     if (error) throw error;
     return data as Client;
   },
@@ -288,11 +319,6 @@ export const api = {
       user_id: userId,
       clientid: id,
       technicienid: options.technicienid || client.technicienid,
-      clientnom: client.nom,
-      clienttelephone: client.telephone,
-      techniciennom: client.techniciennom,
-      quartiernom: client.quartiernom,
-      numerobon: client.numerobon || 'REGLEMENT',
       montant: montant,
       date: options.date || new Date().toISOString().split('T')[0],
       modepaiement: options.modepaiement || 'Espèces',
@@ -319,22 +345,66 @@ export const api = {
     if (!userId) return [];
     const { data, error } = await supabase!.from('installations').select('*').eq('user_id', userId).order('createdat', { ascending: false });
     if (error) throw error;
-    return data as Installation[];
+    return (data || []).map(i => ({
+      ...i,
+      numerocontrat: i.numerocontrole
+    })) as Installation[];
   },
   getInstallation: async (id: string) => {
     const { data, error } = await supabase!.from('installations').select('*').eq('id', id).single();
     if (error) throw error;
-    return data as Installation;
+    return {
+      ...data,
+      numerocontrat: data.numerocontrole
+    } as Installation;
   },
   createInstallation: async (inst: Partial<Installation>) => {
     const userId = await getUserId();
     if (!userId) throw new Error('Authentification requise');
-    const { data, error } = await supabase!.from('installations').insert([{ ...inst, user_id: userId }]).select().single();
+    
+    // Core fields only
+    const coreInst = {
+      clientid: inst.clientid,
+      technicienid: inst.technicienid,
+      dateinstallation: inst.dateinstallation,
+      numerocontrole: inst.numerocontrat,
+      numerobon: inst.numerobon,
+      typeclimatiseur: inst.typeclimatiseur,
+      marque: inst.marque,
+      modele: inst.modele,
+      puissance: inst.puissance,
+      quantite: inst.quantite,
+      prix: inst.prix,
+      montantpaye: inst.montantpaye,
+      statut: inst.statut,
+      tacherealisee: inst.tacherealisee,
+      prixtachesuppl: inst.prixtachesuppl,
+      observation: inst.observation,
+      user_id: userId
+    };
+
+    const { data, error } = await supabase!.from('installations').insert([coreInst]).select().single();
     if (error) throw error;
     return data as Installation;
   },
   updateinstallation: async (id: string, inst: Partial<Installation>) => {
-    const { data, error } = await supabase!.from('installations').update(inst).eq('id', id).select().single();
+    const coreUpdates: any = {};
+    const allowed = [
+      'clientid', 'technicienid', 'dateinstallation', 'numerocontrat', 'numerobon',
+      'typeclimatiseur', 'marque', 'modele', 'puissance', 'quantite', 'prix',
+      'montantpaye', 'statut', 'tacherealisee', 'prixtachesuppl', 'observation'
+    ];
+    allowed.forEach(key => {
+      if ((inst as any)[key] !== undefined) {
+        if (key === 'numerocontrat') {
+          coreUpdates['numerocontrole'] = (inst as any)[key];
+        } else {
+          coreUpdates[key] = (inst as any)[key];
+        }
+      }
+    });
+
+    const { data, error } = await supabase!.from('installations').update(coreUpdates).eq('id', id).select().single();
     if (error) throw error;
     return data as Installation;
   },
@@ -350,11 +420,6 @@ export const api = {
       clientid: inst.clientid,
       installationid: id,
       technicienid: options.technicienid || inst.technicienid,
-      clientnom: inst.clientnom,
-      clienttelephone: inst.clienttelephone,
-      techniciennom: inst.techniciennom,
-      quartiernom: inst.clientquartier,
-      numerobon: inst.numerobon,
       montant: montant,
       date: options.date || new Date().toISOString().split('T')[0],
       modepaiement: options.modepaiement || 'Espèces',
@@ -392,12 +457,35 @@ export const api = {
   createIntervention: async (inter: Partial<Intervention>) => {
     const userId = await getUserId();
     if (!userId) throw new Error('Authentification requise');
-    const { data, error } = await supabase!.from('interventions').insert([{ ...inter, user_id: userId }]).select().single();
+    
+    const coreInter = {
+      clientid: inter.clientid,
+      technicienid: inter.technicienid,
+      installationid: inter.installationid,
+      date: inter.date,
+      typeintervention: inter.typeintervention,
+      descriptiontache: inter.descriptiontache,
+      cout: inter.cout,
+      observation: inter.observation,
+      statut: inter.statut,
+      user_id: userId
+    };
+
+    const { data, error } = await supabase!.from('interventions').insert([coreInter]).select().single();
     if (error) throw error;
     return data as Intervention;
   },
   updateIntervention: async (id: string, inter: Partial<Intervention>) => {
-    const { data, error } = await supabase!.from('interventions').update(inter).eq('id', id).select().single();
+    const coreUpdates: any = {};
+    const allowed = [
+      'clientid', 'technicienid', 'installationid', 'date', 'typeintervention',
+      'descriptiontache', 'cout', 'observation', 'statut'
+    ];
+    allowed.forEach(key => {
+      if ((inter as any)[key] !== undefined) coreUpdates[key] = (inter as any)[key];
+    });
+
+    const { data, error } = await supabase!.from('interventions').update(coreUpdates).eq('id', id).select().single();
     if (error) throw error;
     return data as Intervention;
   },
@@ -423,12 +511,33 @@ export const api = {
   createPaiement: async (paiement: Partial<Paiement>) => {
     const userId = await getUserId();
     if (!userId) throw new Error('Authentification requise');
-    const { data, error } = await supabase!.from('paiements').insert([{ ...paiement, user_id: userId }]).select().single();
+    
+    const corePaiement = {
+      clientid: paiement.clientid,
+      technicienid: paiement.technicienid,
+      installationid: paiement.installationid,
+      montant: paiement.montant,
+      date: paiement.date,
+      modepaiement: paiement.modepaiement,
+      observation: paiement.observation,
+      user_id: userId
+    };
+
+    const { data, error } = await supabase!.from('paiements').insert([corePaiement]).select().single();
     if (error) throw error;
     return data as Paiement;
   },
   updatePaiement: async (id: string, paiement: Partial<Paiement>) => {
-    const { data, error } = await supabase!.from('paiements').update(paiement).eq('id', id).select().single();
+    const coreUpdates: any = {};
+    const allowed = [
+      'clientid', 'technicienid', 'installationid', 'montant', 'date',
+      'modepaiement', 'observation'
+    ];
+    allowed.forEach(key => {
+      if ((paiement as any)[key] !== undefined) coreUpdates[key] = (paiement as any)[key];
+    });
+
+    const { data, error } = await supabase!.from('paiements').update(coreUpdates).eq('id', id).select().single();
     if (error) throw error;
     return data as Paiement;
   },
@@ -498,7 +607,12 @@ export const api = {
         if (error.code === 'PGRST116' || error.code === 'PGRST205') return null;
         throw error;
       }
-      return data as CompanySettings;
+      
+      const settings = data as any;
+      return {
+        ...settings,
+        modelecontratprefix: settings.modelecontroleprefix
+      } as CompanySettings;
     } catch (err) {
       console.warn('Could not load settings from Supabase, using defaults:', err);
       return null;
@@ -509,14 +623,22 @@ export const api = {
     if (!userId) throw new Error('Authentification requise');
     const existing = await api.getSettings();
     
+    const dbSettings: any = { ...settings };
+    if (dbSettings.modelecontratprefix) {
+      dbSettings.modelecontroleprefix = dbSettings.modelecontratprefix;
+      delete dbSettings.modelecontratprefix;
+    }
+
     if (existing) {
-      const { data, error } = await supabase!.from('settings').update(settings).eq('user_id', userId).select().single();
+      const { data, error } = await supabase!.from('settings').update(dbSettings).eq('user_id', userId).select().single();
       if (error) throw error;
-      return data as CompanySettings;
+      const result = data as any;
+      return { ...result, modelecontratprefix: result.modelecontroleprefix } as CompanySettings;
     } else {
-      const { data, error } = await supabase!.from('settings').insert([{ ...settings, user_id: userId }]).select().single();
+      const { data, error } = await supabase!.from('settings').insert([{ ...dbSettings, user_id: userId }]).select().single();
       if (error) throw error;
-      return data as CompanySettings;
+      const result = data as any;
+      return { ...result, modelecontratprefix: result.modelecontroleprefix } as CompanySettings;
     }
   },
 

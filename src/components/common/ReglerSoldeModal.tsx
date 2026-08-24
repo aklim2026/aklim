@@ -15,7 +15,7 @@ interface ReglerSoldeModalProps {
     nom: string;
     kinya?: string;
     numerobon?: string;
-    numerocontrole?: string;
+    numerocontrat?: string;
     totalFacture: number;
     totalPaye: number;
     soldeRestant: number;
@@ -135,7 +135,7 @@ export const ReglerSoldeModal: React.FC<ReglerSoldeModalProps> = ({
               {target.numerobon && (
                 <p className="text-xs text-slate-300 font-mono mt-0.5">
                   N° Bon: <span className="text-white font-bold">{target.numerobon}</span>
-                  {target.numerocontrole && ` • N° Ctrl: ${target.numerocontrole}`}
+                  {target.numerocontrat && ` • N° Contrat: ${target.numerocontrat}`}
                 </p>
               )}
             </div>

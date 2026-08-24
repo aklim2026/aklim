@@ -53,7 +53,7 @@ interface AppContextType {
 const defaultSettings: CompanySettings = {
   user_id: '',
   nomentreprise: 'CLIM EXPERT MAROC SARL',
-  slogan: 'Installation, Contrôle et Maintenance de Systèmes de Climatisation',
+  slogan: 'Installation, Contrat et Maintenance de Systèmes de Climatisation',
   telephone: '+212 5 22 45 88 99',
   email: 'contact@climexpert.ma',
   adresse: 'Bd Abdelmoumen, Tour Casablanca Finance, Casablanca',
@@ -61,7 +61,7 @@ const defaultSettings: CompanySettings = {
   devise: 'DH',
   ice: '002984712000045',
   rc: '458921',
-  modelecontroleprefix: 'CTRL-2026-',
+  modelecontratprefix: 'CONT-2026-',
   modelebonprefix: 'BON-',
 };
 

@@ -84,7 +84,7 @@ export const InstallationDetailModal: React.FC<InstallationDetailModalProps> = (
               {installation.statut}
             </span>
             <span className="text-xs font-mono text-slate-500">
-              Contrôle: <strong className="text-emerald-700 font-bold">{installation.numerocontrole}</strong>
+              Contrat: <strong className="text-emerald-700 font-bold">{installation.numerocontrat}</strong>
             </span>
           </div>
 
@@ -231,6 +231,12 @@ export const InstallationDetailModal: React.FC<InstallationDetailModalProps> = (
             <p className="text-slate-700 bg-slate-50 p-2.5 rounded-lg">
               {installation.tacherealisee || 'Installation standard et mise en service'}
             </p>
+            {installation.prixtachesuppl && (
+              <div className="flex justify-between items-center bg-blue-50 p-2 rounded-lg border border-blue-100 mt-2">
+                <span className="font-semibold text-blue-700">Prix Tâche Suppl:</span>
+                <span className="font-bold text-blue-800">{formatCurrency(installation.prixtachesuppl, settings.devise)}</span>
+              </div>
+            )}
             {installation.observation && (
               <div className="mt-2 text-slate-600">
                 <strong className="text-slate-800">Observation: </strong>
@@ -292,7 +298,7 @@ export const InstallationDetailModal: React.FC<InstallationDetailModalProps> = (
                 nom: installation.clientnom,
                 kinya: installation.clientkinya,
                 numerobon: installation.numerobon,
-                numerocontrole: installation.numerocontrole,
+                numerocontrat: installation.numerocontrat,
                 totalFacture: installation.prix || 0,
                 totalPaye: installation.montantpaye || 0,
                 soldeRestant: solde,

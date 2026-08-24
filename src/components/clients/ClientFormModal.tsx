@@ -204,17 +204,6 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
               ))}
             </select>
           </div>
-          <div className="sm:col-span-2">
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Adresse complète</label>
-            <input
-              id="input-client-adresse"
-              type="text"
-              placeholder="ex: 45 Boulevard Anfa, Résidence Les Palmiers, Apt 12..."
-              value={adresse}
-              onChange={e => setAdresse(e.target.value)}
-              className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
-            />
-          </div>
         </div>
 
         <div>

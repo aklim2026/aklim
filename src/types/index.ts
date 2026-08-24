@@ -54,7 +54,7 @@ export interface Client {
   adresse?: string;
   typeclient?: TypeClient;
   // Last / primary installation info for fast reference
-  numerocontrole?: string;
+  numerocontrat?: string;
   numerobon?: string;
   technicienid?: string;
   techniciennom?: string;
@@ -95,7 +95,7 @@ export interface Installation {
   techniciennom?: string;
   technicienmatricule?: string;
   dateinstallation: string;
-  numerocontrole: string;
+  numerocontrat: string;
   numerobon: string;
   typeclimatiseur: TypeClimatiseur;
   marque: string;
@@ -106,6 +106,7 @@ export interface Installation {
   montantpaye: number;
   statut: InstallationStatut;
   typeclient?: TypeClient;
+  prixtachesuppl?: number;
   tacherealisee: string;
   observation: string;
   createdat: string;
@@ -265,7 +266,7 @@ export interface CompanySettings {
   ice?: string;
   rc?: string;
   logourl?: string;
-  modelecontroleprefix?: string;
+  modelecontratprefix?: string;
   modelebonprefix?: string;
   mentionslegales?: string;
 }

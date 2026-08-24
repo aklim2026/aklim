@@ -178,7 +178,7 @@ export const InterventionsView: React.FC = () => {
             <span>Journal des Interventions Techniques</span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Historique des tâches, poses, entretiens, contrôles et dépannages effectués
+            Historique des tâches, poses, entretiens, contrats et dépannages effectués
           </p>
         </div>
 

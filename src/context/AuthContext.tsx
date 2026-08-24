@@ -21,17 +21,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      console.error('Supabase client not initialized. Check your environment variables.');
+      setIsLoading(false);
+      return;
+    }
+
     // Check initial session
-    supabase?.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
         syncUser(session);
       }
       setIsLoading(false);
+    }).catch(err => {
+      console.error('Auth session error:', err);
+      setIsLoading(false);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase?.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session?.user) {
         syncUser(session);
@@ -39,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCurrentUser(null);
       }
       setIsLoading(false);
-    }) || { data: { subscription: null } };
+    });
 
     return () => {
       subscription?.unsubscribe();

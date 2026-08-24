@@ -118,7 +118,7 @@ export const InterventionFormModal: React.FC<InterventionFormModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={interventionToEdit ? 'Modifier l’Intervention' : 'Enregistrer une Intervention'}
-      subtitle="Suivi des travaux sur site, contrôles et dépannages"
+      subtitle="Suivi des travaux sur site, contrats et dépannages"
       maxWidth="2xl"
       id="intervention-form-modal"
     >
@@ -180,7 +180,7 @@ export const InterventionFormModal: React.FC<InterventionFormModalProps> = ({
               <option value="Entretien / Nettoyage">Entretien / Nettoyage</option>
               <option value="Dépannage / SAV">Dépannage / SAV</option>
               <option value="Recharge Gaz R410A/R32">Recharge Gaz R410A / R32</option>
-              <option value="Contrôle de conformité">Contrôle de conformité</option>
+              <option value="Suivi de contrat">Suivi de contrat</option>
               <option value="Déplacement / Désinstallation">Déplacement / Désinstallation</option>
               <option value="Autre">Autre intervention</option>
             </select>

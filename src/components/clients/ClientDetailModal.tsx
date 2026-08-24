@@ -148,7 +148,7 @@ export const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
             </div>
             <div className="flex items-center gap-1.5 font-medium text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
               <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-              <span>{client.quartiernom} {client.adresse ? `• ${client.adresse}` : ''}</span>
+              <span>{client.quartiernom}</span>
             </div>
           </div>
 
@@ -348,7 +348,7 @@ export const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
                     <th className="p-3 whitespace-nowrap">Climatiseur & Puissance</th>
                     <th className="p-3 whitespace-nowrap">Type</th>
                     <th className="p-3 whitespace-nowrap text-center">Qté</th>
-                    <th className="p-3 whitespace-nowrap">N° Bon / Contrôle</th>
+                    <th className="p-3 whitespace-nowrap">N° Bon / Contrat</th>
                     <th className="p-3 whitespace-nowrap">Technicien</th>
                     <th className="p-3 whitespace-nowrap">Date Installation</th>
                     <th className="p-3 whitespace-nowrap text-right">Prix</th>
@@ -365,7 +365,7 @@ export const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
                       <td className="p-3 text-center font-bold text-slate-800 whitespace-nowrap">{inst.quantite}</td>
                       <td className="p-3 font-mono text-[11px] whitespace-nowrap">
                         <div className="text-indigo-600 font-bold">{inst.numerobon ? `Bon: ${inst.numerobon}` : '-'}</div>
-                        <div className="text-emerald-600">{inst.numerocontrole ? `Ctrl: ${inst.numerocontrole}` : '-'}</div>
+                        <div className="text-emerald-600">{inst.numerocontrat ? `Contrat: ${inst.numerocontrat}` : '-'}</div>
                       </td>
                       <td className="p-3 font-medium text-slate-800 whitespace-nowrap">
                         {inst.techniciennom || <span className="text-slate-400 italic">Non affecté</span>}
@@ -509,7 +509,7 @@ export const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
                 nom: client.nom,
                 kinya: client.kinya,
                 numerobon: client.numerobon,
-                numerocontrole: client.numerocontrole,
+                numerocontrat: client.numerocontrat,
                 totalFacture,
                 totalPaye,
                 soldeRestant,

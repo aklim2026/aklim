@@ -64,7 +64,7 @@ function drawCorporateHeader(
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(148, 163, 184); // slate-400
-  const slogan = settings.slogan || "Installation, Contrôle et Maintenance de Systèmes de Climatisation";
+  const slogan = settings.slogan || "Installation, Contrat et Maintenance de Systèmes de Climatisation";
   doc.text(truncateTextToWidth(doc, slogan, leftMaxWidth), 14, 17.5);
 
   // 3. Contact Phone & Email
@@ -706,7 +706,7 @@ export function exportClientPDF(
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(71, 85, 105);
   doc.text(`Téléphone : ${c.telephone}   |   Quartier : ${c.quartiernom}   |   Adresse : ${c.adresse || 'N/A'}`, 20, currentY + 12);
-  doc.text(`N° de Bon : ${c.numerobon || 'N/A'}   |   N° Contrôle : ${c.numerocontrole || 'N/A'}   |   Technicien référent : ${c.techniciennom || 'N/A'}`, 20, currentY + 17);
+  doc.text(`N° de Bon : ${c.numerobon || 'N/A'}   |   N° Contrat : ${c.numerocontrat || 'N/A'}   |   Technicien référent : ${c.techniciennom || 'N/A'}`, 20, currentY + 17);
 
   // Financial Recap Strip inside client card
   doc.setFont('helvetica', 'bold');
@@ -734,7 +734,7 @@ export function exportClientPDF(
     `${i.marque} ${i.puissance}`,
     `${i.quantite}`,
     i.numerobon,
-    i.numerocontrole,
+    i.numerocontrat,
     formatCurrency(i.prix, settings.devise),
     i.statut,
     i.techniciennom || '-',
@@ -742,7 +742,7 @@ export function exportClientPDF(
 
   autoTable(doc, {
     startY: currentY,
-    head: [['Date', 'Climatiseur', 'Qté', 'N° Bon', 'N° Contrôle', 'Prix', 'Statut', 'Technicien']],
+    head: [['Date', 'Climatiseur', 'Qté', 'N° Bon', 'N° Contrat', 'Prix', 'Statut', 'Technicien']],
     body: instData.length > 0 ? instData : [['-', 'Aucune installation', '-', '-', '-', '-', '-', '-']],
     theme: 'grid',
     styles: { fontSize: 7.2, cellPadding: 2, textColor: [30, 41, 59] },
@@ -788,7 +788,7 @@ export function exportClientPDF(
 }
 
 /**
- * EXPORT: BON D'INSTALLATION & DE CONTRÔLE OFFICIEL (PRO DESIGN)
+ * EXPORT: BON D'INSTALLATION & DE CONTRAT OFFICIEL (PRO DESIGN)
  */
 export function exportInstallationBonPDF(
   inst: Installation,
@@ -806,7 +806,7 @@ export function exportInstallationBonPDF(
   drawCorporateHeader(
     doc,
     settings,
-    "BON D'INSTALLATION & CONTRÔLE",
+    "BON D'INSTALLATION & CONTRAT",
     `Réf Bon : ${inst.numerobon}`,
     refCode,
     dateNow
@@ -838,7 +838,7 @@ export function exportInstallationBonPDF(
   doc.text(`Nom : ${inst.clientnom || ''} (${inst.clientkinya || ''})`, 18, currentY + 12);
   doc.text(`Téléphone : ${inst.clienttelephone || '-'}`, 18, currentY + 17.5);
   doc.text(`Quartier : ${inst.clientquartier || '-'}`, 18, currentY + 23);
-  doc.text(`N° de Contrôle : ${inst.numerocontrole}`, 18, currentY + 28.5);
+  doc.text(`N° de Contrat : ${inst.numerocontrat}`, 18, currentY + 28.5);
 
   // Tech Box
   const box2X = 14 + boxWidth + 6;
@@ -905,8 +905,17 @@ export function exportInstallationBonPDF(
   doc.setTextColor(51, 65, 85);
   doc.text(inst.tacherealisee || 'Pose de l\'unité intérieure/extérieure, raccordement frigorifique, tirage au vide et mise en service.', 18, currentY + 13);
 
+  if (inst.prixtachesuppl) {
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(37, 99, 235);
+    doc.text(`Montant Travaux Suppl : ${formatCurrency(inst.prixtachesuppl, settings.devise)}`, 18, currentY + 19);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(51, 65, 85);
+  }
+
   if (inst.observation) {
-    doc.text(`Observation : ${inst.observation}`, 18, currentY + 19.5);
+    const yOffset = inst.prixtachesuppl ? 24 : 19.5;
+    doc.text(`Observation : ${inst.observation}`, 18, currentY + yOffset);
   }
 
   currentY += 34;

@@ -123,7 +123,7 @@ export const InstallationsView: React.FC = () => {
       (inst.clientnom && inst.clientnom.toLowerCase().includes(term)) ||
       (inst.techniciennom && inst.techniciennom.toLowerCase().includes(term)) ||
       (inst.numerobon && inst.numerobon.toLowerCase().includes(term)) ||
-      (inst.numerocontrole && inst.numerocontrole.toLowerCase().includes(term)) ||
+      (inst.numerocontrat && inst.numerocontrat.toLowerCase().includes(term)) ||
       inst.marque.toLowerCase().includes(term) ||
       inst.typeclimatiseur.toLowerCase().includes(term) ||
       (inst.clientquartier && inst.clientquartier.toLowerCase().includes(term));
@@ -176,12 +176,13 @@ export const InstallationsView: React.FC = () => {
       'Puissance': i.puissance,
       'Quantité': i.quantite,
       'N° de Bon': i.numerobon,
-      'N° de Contrôle': i.numerocontrole,
+      'N° de Contrat': i.numerocontrat,
       'Prix Total (DH)': i.prix,
       'Montant Payé (DH)': i.montantpaye || 0,
       'Solde Restant (DH)': Math.max(0, i.prix - (i.montantpaye || 0)),
       'Statut': i.statut,
       'Tâche': i.tacherealisee,
+      'Prix Tâche Suppl. (DH)': i.prixtachesuppl || 0,
       'Observation': i.observation,
     }));
     exportToExcel(data, 'Installations_ClimTrack', 'Installations');
@@ -198,7 +199,7 @@ export const InstallationsView: React.FC = () => {
             <span>Suivi des Installations de Climatiseurs</span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Gestion des équipements, des bons d'installation, des contrôles et des statuts
+            Gestion des équipements, des bons d'installation, des contrats et des statuts
           </p>
         </div>
 
@@ -229,7 +230,7 @@ export const InstallationsView: React.FC = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Rechercher par client, bon, contrôle, marque, technicien..."
+              placeholder="Rechercher par client, bon, contrat, marque, technicien..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
@@ -301,7 +302,7 @@ export const InstallationsView: React.FC = () => {
                   <th className="p-3.5 whitespace-nowrap">Client & Quartier</th>
                   <th className="p-3.5 whitespace-nowrap hidden sm:table-cell">Technicien</th>
                   <th className="p-3.5 whitespace-nowrap">Climatiseur & Puissance</th>
-                  <th className="p-3.5 whitespace-nowrap hidden lg:table-cell">N° Bon / Contrôle</th>
+                  <th className="p-3.5 whitespace-nowrap hidden lg:table-cell">N° Bon / Contrat</th>
                   <th className="p-3.5 text-right whitespace-nowrap">Prix / Solde</th>
                   <th className="p-3.5 whitespace-nowrap hidden sm:table-cell">Statut</th>
                   <th className="p-3.5 text-center whitespace-nowrap">Actions</th>
@@ -354,7 +355,7 @@ export const InstallationsView: React.FC = () => {
                       </td>
                       <td className="p-3.5 font-mono text-[11px] whitespace-nowrap hidden lg:table-cell">
                         <div className="font-bold text-indigo-700 whitespace-nowrap">Bon: {inst.numerobon}</div>
-                        <div className="text-emerald-700 whitespace-nowrap">Ctrl: {inst.numerocontrole}</div>
+                        <div className="text-emerald-700 whitespace-nowrap">Contrat: {inst.numerocontrat}</div>
                       </td>
                       <td className="p-3.5 text-right whitespace-nowrap font-medium">
                         <div className="font-bold text-slate-900 whitespace-nowrap text-[11px] sm:text-xs">
@@ -380,7 +381,7 @@ export const InstallationsView: React.FC = () => {
                                     nom: inst.clientnom,
                                     kinya: inst.clientkinya,
                                     numerobon: inst.numerobon,
-                                    numerocontrole: inst.numerocontrole,
+                                    numerocontrat: inst.numerocontrat,
                                     totalFacture: inst.prix || 0,
                                     totalPaye: inst.montantpaye || 0,
                                     soldeRestant: solde,
@@ -443,7 +444,7 @@ export const InstallationsView: React.FC = () => {
                                   nom: inst.clientnom,
                                   kinya: inst.clientkinya,
                                   numerobon: inst.numerobon,
-                                  numerocontrole: inst.numerocontrole,
+                                  numerocontrat: inst.numerocontrat,
                                   totalFacture: inst.prix || 0,
                                   totalPaye: inst.montantpaye || 0,
                                   soldeRestant: solde,

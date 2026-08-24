@@ -102,7 +102,7 @@ export const DashboardView: React.FC = () => {
     {
       title: 'Total Interventions',
       value: stats.totalInterventions,
-      sub: 'Tâches, contrôles & SAV',
+      sub: 'Tâches, contrats & SAV',
       icon: FileCheck2,
       color: 'cyan',
       tab: 'interventions',

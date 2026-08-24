@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
 import { Installation, Client, Technicien, TypeClimatiseur, InstallationStatut, TypeClient } from '../../types';
 import { Modal } from '../common/Modal';
-import { generateNumeroControle, generateNumeroBon } from '../../utils/formatters';
+import { generateNumeroContrat, generateNumeroBon } from '../../utils/formatters';
 
 interface InstallationFormModalProps {
   isOpen: boolean;
@@ -26,7 +26,7 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
   const [clientid, setClientId] = useState('');
   const [technicienid, setTechnicienId] = useState('');
   const [dateinstallation, setDateInstallation] = useState('');
-  const [numerocontrole, setNumeroControle] = useState('');
+  const [numerocontrat, setNumeroContrat] = useState('');
   const [numerobon, setNumeroBon] = useState('');
   const [typeclimatiseur, setTypeClimatiseur] = useState<TypeClimatiseur>('Split Mural');
   const [marque, setMarque] = useState('Daikin');
@@ -37,7 +37,8 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
   const [montantpaye, setMontantPaye] = useState<number>(0);
   const [statut, setStatut] = useState<InstallationStatut>('Installée');
   const [typeclient, setTypeClient] = useState<TypeClient>('Standard');
-  const [tacherealisee, setTacheRealisee] = useState('Installation standard, tirage au vide et mise en service');
+  const [tacherealisee, setTacheRealisee] = useState('');
+  const [prixtachesuppl, setPrixTacheSuppl] = useState<number>(0);
   const [observation, setObservation] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -54,7 +55,7 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
         setClientId(installationToEdit.clientid);
         setTechnicienId(installationToEdit.technicienid);
         setDateInstallation(installationToEdit.dateinstallation);
-        setNumeroControle(installationToEdit.numerocontrole);
+        setNumeroContrat(installationToEdit.numerocontrat);
         setNumeroBon(installationToEdit.numerobon);
         setTypeClimatiseur(installationToEdit.typeclimatiseur);
         setMarque(installationToEdit.marque);
@@ -66,10 +67,11 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
         setStatut(installationToEdit.statut);
         setTypeClient(installationToEdit.typeclient || 'Standard');
         setTacheRealisee(installationToEdit.tacherealisee || '');
+        setPrixTacheSuppl(installationToEdit.prixtachesuppl || 0);
         setObservation(installationToEdit.observation || '');
       } else {
         setDateInstallation(new Date().toISOString().split('T')[0]);
-        setNumeroControle(generateNumeroControle());
+        setNumeroContrat(generateNumeroContrat());
         setNumeroBon(generateNumeroBon());
         setTypeClimatiseur('Split Mural');
         setMarque('Daikin');
@@ -80,7 +82,8 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
         setMontantPaye(0);
         setStatut('Installée');
         setTypeClient('Standard');
-        setTacheRealisee('Installation standard, tirage au vide et mise en service');
+        setTacheRealisee('');
+        setPrixTacheSuppl(0);
         setObservation('');
       }
     }
@@ -103,7 +106,7 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
         clientid,
         technicienid,
         dateinstallation,
-        numerocontrole,
+        numerocontrat,
         numerobon,
         typeclimatiseur,
         marque,
@@ -115,6 +118,7 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
         statut,
         typeclient,
         tacherealisee,
+        prixtachesuppl,
         observation,
       };
 
@@ -216,7 +220,7 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={installationToEdit ? 'Modifier l’Installation' : 'Nouvelle Installation de Climatiseur'}
-      subtitle="Spécifications techniques, affectation technicien et numéros de contrôle"
+      subtitle="Spécifications techniques, affectation technicien et numéros de contrat"
       maxWidth="3xl"
       id="installation-form-modal"
     >
@@ -288,12 +292,12 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">Numéro de Contrôle *</label>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Numéro de Contrat *</label>
             <input
               type="text"
               required
-              value={numerocontrole}
-              onChange={e => setNumeroControle(e.target.value)}
+              value={numerocontrat}
+              onChange={e => setNumeroContrat(e.target.value)}
               className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
             />
           </div>
@@ -411,6 +415,27 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
                 className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
               />
             </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-medium text-slate-700 mb-1">Tâche supplémentaire (ex: Gaz, Tuyauterie...)</label>
+              <input
+                type="text"
+                placeholder="Décrivez les travaux additionnels..."
+                value={tacherealisee}
+                onChange={e => setTacheRealisee(e.target.value)}
+                className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Prix Tâche Suppl. (DH)</label>
+              <input
+                type="number"
+                placeholder="0.00"
+                value={prixtachesuppl || ''}
+                onChange={e => setPrixTacheSuppl(Number(e.target.value))}
+                className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+              />
+            </div>
           </div>
         </div>
 
@@ -478,17 +503,6 @@ export const InstallationFormModal: React.FC<InstallationFormModalProps> = ({
               </div>
             </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-medium text-slate-700 mb-1">Tâche réalisée *</label>
-              <input
-                type="text"
-                required
-                placeholder="ex: Pose de support mural, tirage au vide, raccordement frigorifique"
-                value={tacherealisee}
-                onChange={e => setTacheRealisee(e.target.value)}
-                className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
-              />
-            </div>
             <div className="sm:col-span-2">
               <label className="block text-xs font-medium text-slate-700 mb-1">Observation</label>
               <textarea

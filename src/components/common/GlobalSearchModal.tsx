@@ -117,7 +117,7 @@ export const GlobalSearchModal: React.FC = () => {
             ref={inputRef}
             id="input-global-search"
             type="text"
-            placeholder="Rechercher par nom, prénom, téléphone (ex: 0612...), N° bon, N° contrôle, quartier, technicien..."
+            placeholder="Rechercher par nom, prénom, téléphone (ex: 0612...), N° bon, N° contrat, quartier, technicien..."
             value={query}
             onChange={e => setQuery(e.target.value)}
             className="w-full bg-transparent border-0 text-slate-900 placeholder:text-slate-400 text-base focus:ring-0 focus:outline-hidden"
@@ -180,7 +180,7 @@ export const GlobalSearchModal: React.FC = () => {
               <div className="max-w-md mx-auto space-y-2">
                 <p className="font-medium text-slate-600">Recherche rapide intelligente</p>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Tapez le prénom d'un technicien (<span className="text-indigo-600 font-medium">Ahmed</span>), un téléphone (<span className="text-indigo-600 font-medium">0612345678</span>), un N° de bon (<span className="text-indigo-600 font-medium">BON-1001</span>), un N° de contrôle (<span className="text-indigo-600 font-medium">CTRL-2026-001</span>) ou un quartier (<span className="text-indigo-600 font-medium">Maârif</span>).
+                  Tapez le prénom d'un technicien (<span className="text-indigo-600 font-medium">Ahmed</span>), un téléphone (<span className="text-indigo-600 font-medium">0612345678</span>), un N° de bon (<span className="text-indigo-600 font-medium">BON-1001</span>), un N° de contrat (<span className="text-indigo-600 font-medium">CONT-2026-001</span>) أو un quartier (<span className="text-indigo-600 font-medium">Maârif</span>).
                 </p>
               </div>
             </div>
